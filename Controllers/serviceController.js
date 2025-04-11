@@ -1,98 +1,86 @@
-import { getHelperAllServices, getHelperAllCountries, getHelperAllOperators, getHelperAllProducts, getHelperAllProductsById, getHelperProductsByRegion } from '../Helper/serviceHelper.js';
+import { getSpecificServices, getAllServices, getSpecificCountries, getAllCountries, getAllOperators, getSpecificOperators, getAllProducts, getSpecificProducts, getProductsByRegion  } from "../utils/helper.js";
 
-export const getAllServices = async () => {
+
+
+
+export const serviceRoute = async (req, res) => {
+    const { id } = req.query;
+    console.log(id, "req");
+  
     try {
-        const services = await getHelperAllServices();
-        return (services);
+      if (id) {
+        const response = await getSpecificServices(id);
+        return res.status(200).send(response);
+      } else {
+        const response = await getAllServices();
+        return res.status(200).send(response);
+      }
     } catch (error) {
-        return ({ message: error.message });
+      console.error("Error in /services route:", error.message);
+      return res.status(500).send({ message: "Internal server error" });
     }
-}
-export const getSpecificServices = async (id) => {
-    try {
-        const services = await getHelperAllServices(id);
-        // res.status(200).send(services);
-        return services;
-    } catch (error) {
-        return ({ message: error.message });
-    }
-}
-export const getAllCountries = async () => {
-    try {
-        const countries = await getHelperAllCountries();
-        return (countries);
-    } catch (error) {
-        return ({ message: error.message });
-    }
-}
-export const getSpecificCountries = async (iso_code) => {
-    try {
-        const countries = await getHelperAllCountries(iso_code);
-        return (countries);
-    } catch (error) {
-        return ({ message: error.message });
-    }
-}
-export const getAllOperators = async () => {
-    try {
-        const operators = await getHelperAllOperators();
-        return (operators);
-    } catch (error) {
-        return ({ message: error.message });
-    }
-}
-export const getSpecificOperators = async (id) => {
-    try {
-        const operators = await getHelperAllOperators(id);
-        return (operators);
-    } catch (error) {
-        return ({ message: error.message });
-    }
-}
-export const getAllProducts = async (productId) => {
-    if (productId){
-        try {
-            const products = await getHelperAllProductsById(productId);
-            return (products);
-        } catch (error) {
-            return ({ message: error.message });
+};
+export const countriesRoute = async (req, res) => {
+
+      const { iso_code } = req.query;
+      console.log(iso_code, "req");
+  
+      try {
+        if (iso_code) {
+          const response = await getSpecificCountries(iso_code);
+          return res.status(200).send(response);
+        } else {
+          const response = await getAllCountries();
+          return res.status(200).send(response);
         }
-    }
-    else {
-        try {
-            const products = await getHelperAllProducts();
-            return (products);
-        } catch (error) {
-            return ({ message: error.message });
-        }
-    }
+      } catch (error) {
+        console.error("Error in /countries route:", error.message);
+        return res.status(500).send({ message: "Internal server error" });
+      }
     
-}
-export const getSpecificProducts = async (service_id, country_iso_code) => {
-    console.log(service_id, country_iso_code, "true nahi hue");
-    if (service_id && country_iso_code) {
-        try {
-            const products = await getHelperAllProducts(service_id, country_iso_code);
-            return (products);
-        } catch (error) {
-            return ({ message: error.message });
-        }
+};
+export const operatorRoutes = async (req, res) => {
+    const { id } = req.query;
+    console.log(id, "req");
+  
+    try {
+      if (id) {
+        const response = await getSpecificOperators(id);
+        return res.status(200).send(response);
+      } else {
+        const response = await getAllOperators();
+        return res.status(200).send(response);
+      }
+    } catch (error) {
+      console.error("Error in /operators route:", error.message);
+      return res.status(500).send({ message: 'Internal server error' });
     }
-    //     try {
-    //         const products = await getHelperAllProducts(service_id, country_iso_code);
-    //         return(products);
-    //     } catch (error) {
-    //         return({ message: error.message });
-    //     }
-    // }
+  
 }
-export const getProductsByRegion = async (region) => {
-    if (region) {
-        try {
-            const products = await getHelperProductsByRegion(region);
-            return (products);
-        } catch (error) {
-            return ({ message: error.message });
-        }
+export const productRoute = async (req, res) => {
+    const { service_id, country_iso_code, product_Id } = req.query;
+    console.log(service_id, country_iso_code, product_Id, "req");
+  
+    try {
+      if (service_id && country_iso_code) {
+        const response = await getSpecificProducts(service_id, country_iso_code);
+        return res.status(200).send(response);
+      } 
+      else if (product_Id) {
+        console.log(product_Id, "product_Id ke ander");
+        const response = await getAllProducts(product_Id);
+        return res.status(200).send(response);
+      } 
+      else if (country_iso_code) {
+        const response = await getProductsByRegion(country_iso_code);
+        return res.status(200).send(response);
+      } 
+      else {
+        const response = await getAllProducts();
+        return res.status(200).send(response);
+      }
+    } catch (error) {
+      console.error('Error in /products route:', error);
+      return res.status(500).send({ message: 'Internal server error' });
     }
-}
+};
